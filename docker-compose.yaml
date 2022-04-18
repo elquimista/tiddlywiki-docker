@@ -1,0 +1,24 @@
+---
+# MIT License
+# Copyright (c) 2022-2022 Nicola Worthington <nicolaw@tfb.net>
+# https://gitlab.com/nicolaw/tiddlywiki
+
+version: "3.4"
+
+services:
+  tiddlywiki:
+    container_name: tiddlywiki
+    image: nicolaw/tiddlywiki
+    user: root:root
+    environment:
+      TW_WIKINAME: mywiki
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./tiddlywiki:/var/lib/tiddlywiki/
+    build:
+      context: https://github.com/neechbear/tiddlywiki.git
+      #args:
+      #  TW_VERSION: 5.2.2
+      #  USER: 1000
+      #  BASE_IMAGE: 17.9-alpine3.15
