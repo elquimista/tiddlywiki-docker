@@ -3,10 +3,11 @@
 [TiddlyWiki 5](https://tiddlywiki.com) Docker image.
 
 Google Cloud users may also be interested in
-https://github.com/neechbear/tiddlywiki-gce.
+https://gitlab.com/neechbear/tiddlywiki-gce.
 
 ## Supported Tags
 
+* `5.2.2`, `5.2.2-node17.9-alpine3.15`, `latest`
 * `5.2.0`, `5.2.0-node17.0-alpine3.13`
 * `5.1.23`, `5.1.23-node14.18.1-alpine3.14`
 * `5.1.22`, `5.1.22-node14.9.0-alpine3.12`
@@ -44,7 +45,7 @@ $ docker run \
 ## Systemd Service
 
 A systemd service unit file is included in the source repository of this
-project. (See https://github.com/neechbear/tiddlywiki ). This can be installed to
+project. (See https://gitlab.com/nicolaw/tiddlywiki). This can be installed to
 automatically start one or more TiddlyWikis every time your machine boots.
 
 It also provides you with some level of configurability by simply changing the
@@ -172,22 +173,24 @@ This allows control over the following `Dockerfile` build arguments:
 * `USER` - Unix user or UID to run the TiddlyWiki process as (useful if
   your container runtime environment does not allow you to override)
 
-The `Makefile` in the https://github.com/neechbear/tiddlywiki.git also makes use
+The `Makefile` in the https://gitlab.com/nicolaw/tiddlywiki.git also makes use
 of these build arguments in a similar way.
 
-Example [Docker compose](https://docs.docker.com/compose/) definition:
+Example partial [Docker compose](https://docs.docker.com/compose/) definition:
 
 ```
 tiddlywiki:
-   container_name: tiddlywiki
-   image: nicolaw/tiddlywiki
-   build:
-     context: https://github.com/neechbear/tiddlywiki.git
-     args:
-       TW_VERSION: 5.1.23
-       USER: 501
-       BASE_IMAGE: 14-alpine3.12
+  container_name: tiddlywiki
+  image: nicolaw/tiddlywiki
+  build:
+    context: https://gitlab.com/nicolaw/tiddlywiki.git
+    args:
+      TW_VERSION: 5.2.2
+      USER: 501
+      BASE_IMAGE: 17.9-alpine3.15
 ````
+
+See https://gitlab.com/nicolaw/tiddlywiki/-/blob/master/docker-compose.yaml.
 
 ## Author
 
@@ -198,7 +201,7 @@ https://nicolaw.uk/#TiddlyWiki.
 
 MIT License
 
-Copyright (c) 2018-2021 Nicola Worthington
+Copyright (c) 2018-2022 Nicola Worthington
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

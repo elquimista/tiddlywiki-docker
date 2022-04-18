@@ -17,7 +17,7 @@ services:
     volumes:
       - ./tiddlywiki:/var/lib/tiddlywiki/
     build:
-      context: https://github.com/neechbear/tiddlywiki.git
+      context: https://gitlab.com/nicolaw/tiddlywiki.git
       #args:
       #  TW_VERSION: 5.2.2
       #  USER: 1000
