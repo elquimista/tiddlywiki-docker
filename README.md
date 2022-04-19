@@ -76,7 +76,7 @@ Specifying a volume bind mount location for `/var/lib/tiddlywiki` will cause the
 Tiddler data to be written to that location on your local filesystem.
 
 ```
-$ docker run --rm -p 8080:8080 -v ~/wikidata:/var/lib/tiddlyiki --name mywiki nicolaw/tiddlywiki
+$ docker run --rm -p 8080:8080 -v ~/wikidata:/var/lib/tiddlywiki --name mywiki nicolaw/tiddlywiki
 ```
 
 In the case of operating TiddlyWiki from systemd, the Docker volume has the
