@@ -31,6 +31,7 @@ source "amazon-ebs" "default-public" {
 
   region        = var.region
   ami_groups    = var.public_ami ? ["all"] : null
+  encrypt_boot  = var.public_ami ? false : true
   ami_regions   = var.ami_regions
 
   # https://github.com/hashicorp/packer-plugin-amazon/issues/18
@@ -95,17 +96,20 @@ build {
   provisioner "shell" {
     inline = [
       "sleep 10",
-      "sudo mkdir -pv /etc/tiddlywiki/",
+      "sed -i 's/^[[:space:]]*#[[:space:]]*TW_PORT=.*/TW_PORT=80/' /tmp/tiddlywiki.service.conf",
+      "sed -i 's/^[[:space:]]*#[[:space:]]*TW_PORT=.*/TW_PORT=80/' /tmp/tiddlywiki.service.conf",
+      "sudo mkdir -pv /etc/tiddlywiki/ /home/ec2-user/tiddlywiki/",
       "sudo mv -v /tmp/tiddlywiki.service /etc/systemd/system/tiddlywiki.service",
       "sudo mv -v /tmp/tiddlywiki.service.conf /etc/tiddlywiki/tiddlywiki.service.conf",
       "sudo yum update -y",
       "sudo yum install -y docker",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable docker.service",
-      "sudo docker start docker.serice",
+      "sudo systemctl start docker.service",
       "sleep 10",
+      "sudo docker volume create --name tiddlywiki.service --opt type=none --opt device=/home/ec2-user/tiddlywiki --opt o=bind",
       "sudo systemctl enable tiddlywiki.service",
-      "sudo docker start tiddlywiki.service",
+      "sudo systemctl start tiddlywiki.service",
     ]
   }
 }
