@@ -1,0 +1,95 @@
+include:
+  # https://docs.gitlab.com/ee/user/application_security/container_scanning/index.html
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Security/Container-Scanning.gitlab-ci.yml
+  - template: Security/Container-Scanning.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/compliance/license_compliance/index.html
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Security/License-Scanning.gitlab-ci.yml
+  - template: Security/License-Scanning.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/application_security/secret_detection/index.html
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/Secret-Detection.gitlab-ci.yml
+  - template: Jobs/Secret-Detection.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/application_security/iac_scanning/index.html
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/SAST-IaC.latest.gitlab-ci.yml
+  - template: Jobs/SAST-IaC.latest.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/SAST.gitlab-ci.yml
+  - template: Jobs/SAST.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/application_security/dependency_scanning/analyzers.html
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Security/Dependency-Scanning.gitlab-ci.yml
+  - template: Security/Dependency-Scanning.gitlab-ci.yml
+  # https://docs.gitlab.com/ee/user/project/merge_requests/code_quality.html#example-configuration
+  # https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Jobs/Code-Quality.gitlab-ci.yml
+  - template: Jobs/Code-Quality.gitlab-ci.yml
+
+stages:
+  - test
+  - build
+  - scan
+  - upload
+  - release
+
+sast:
+  stage: test
+
+.dind:
+  image: docker:latest
+  services:
+    - name: docker:dind
+      alias: docker
+      command: ["--experimental"]
+  variables:
+    DOCKER_HOST: tcp://docker:2376
+    DOCKER_TLS_VERIFY: "1"
+    DOCKER_TLS_CERTDIR: "/certs"
+    DOCKER_CERT_PATH: "/certs/client"
+    MULTIARCH_PLATFORMS: "linux/arm64,linux/amd64,linux/arm/v6,linux/arm/v7"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - >
+      [[ -z "$DOCKERHUB_TOKEN" ]] || cat "$DOCKERHUB_TOKEN" | docker login -u nicolaw --password-stdin docker.io
+    - mkdir -p ~/.docker/cli-plugins
+    - apk add -q dpkg curl && export ARCH="$(dpkg --print-architecture | sed -e 's/.*-//')"
+    - curl -sSLo ~/.docker/cli-plugins/docker-buildx "https://github.com/docker/buildx/releases/download/v0.7.1/buildx-v0.7.1.linux-$ARCH"
+    - chmod a+x ~/.docker/cli-plugins/docker-buildx
+    - docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+    - docker context create builder
+    - docker buildx create --name multiarch --driver docker-container --use builder
+
+.multiarch-container:
+  extends: .dind
+  variables:
+    CACHE_IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  script:
+    - >-
+      docker buildx build -f Dockerfile .
+      --progress plain
+      --platform "$MULTIARCH_PLATFORMS"
+      --pull --push
+      --cache-from="type=registry,ref=${CACHE_IMAGE_NAME}"
+      --cache-to="type=registry,ref=${CACHE_IMAGE_NAME}"
+      $(for tag in $TAGS ; do echo -t $tag ; done)
+    - for tag in $TAGS ; do docker manifest inspect $tag ; done
+
+build:container:
+  stage: build
+  extends: .multiarch-container
+  variables:
+    TAGS: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+
+container_scanning:
+  stage: scan
+  variables:
+    CS_DEFAULT_BRANCH_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    DOCKER_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+    SECURE_LOG_LEVEL: debug
+    GIT_STRATEGY: fetch
+  needs:
+    - build:container
+
+upload:container:
+  stage: upload
+  extends: .multiarch-container
+  variables:
+    TAGS: docker.io/nicolaw/tiddlywiki:$CI_COMMIT_TAG docker.io/nicolaw/tiddlywiki:latest
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]{1,4}\.[0-9]{1,4}\.[0-9]{1,4}.*$/'
