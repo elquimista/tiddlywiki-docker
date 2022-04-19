@@ -21,6 +21,11 @@ IMAGE_TAGS = $(REPOSITORY):$(TW_VERSION) \
 
 MAKEFILE_DIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
+AWS_REGIONS = $(shell aws ec2 describe-regions \
+				--filter "Name=opt-in-status,Values=opt-in-not-required" \
+				--output json --query 'Regions[].RegionName[]' \
+				| tr -d '[[:space:]]')
+
 build:
 	DOCKER_BUILDKIT=1 docker $@ \
 	  --no-cache \
@@ -36,5 +41,5 @@ push:
 
 ami:
 	packer init -upgrade .
-	packer build .
+	packer build -var ami_regions='[$(AWS_REGIONS)]' .
 

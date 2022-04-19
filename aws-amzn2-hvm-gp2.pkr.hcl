@@ -34,21 +34,21 @@ variable "ami_regions" {
   default     = ["eu-west-2"]
 }
 
-source "amazon-ebs" "default-public" {
+source "amazon-ebs" "default" {
   ssh_username            = "ec2-user"
   ami_virtualization_type = "hvm"
 
-  region        = var.region
-  ami_groups    = var.public_ami ? ["all"] : null
-  encrypt_boot  = var.public_ami ? false : true
-  ami_regions   = var.ami_regions
+  region       = var.region
+  ami_groups   = var.public_ami ? ["all"] : null
+  encrypt_boot = var.public_ami ? false : true
+  ami_regions  = var.ami_regions
 
   # https://github.com/hashicorp/packer-plugin-amazon/issues/18
   associate_public_ip_address = true
 
   vpc_filter {
     filters = {
-      "isDefault": "true"
+      "isDefault" : "true"
     }
   }
 
@@ -56,7 +56,7 @@ source "amazon-ebs" "default-public" {
     most_free = true
     random    = true
     filters = {
-      "subnet-id": "*"
+      "subnet-id" : "*"
     }
   }
 }
@@ -69,15 +69,15 @@ locals {
 }
 
 build {
-  name    = "tiddlywiki"
+  name = "tiddlywiki"
 
   dynamic "source" {
     for_each = local.architecture_instance_type_map
-    labels   = ["amazon-ebs.default-public"]
+    labels   = ["amazon-ebs.default"]
 
     content {
-      ami_name        = "tiddlywiki-ami-hvm-${ formatdate("YYYYMMDD", timestamp()) }-${ source.key }-gp2"
-      ami_description = "TiddlyWiki Linux AMI ${ formatdate("YYYYMMDD", timestamp()) } ${ source.key } HVM gp2"
+      ami_name        = "tiddlywiki-ami-hvm-${formatdate("YYYYMMDD", timestamp())}-${source.key}-gp2"
+      ami_description = "TiddlyWiki Linux AMI ${formatdate("YYYYMMDD", timestamp())} ${source.key} HVM gp2"
       instance_type   = source.value
 
       source_ami_filter {
