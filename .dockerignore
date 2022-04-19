@@ -1,0 +1,6 @@
+tiddlywiki
+tiddlywiki/**
+.git
+.git/**
+.vscode
+.vscode/**

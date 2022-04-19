@@ -1,7 +1,12 @@
 ---
+#
 # MIT License
 # Copyright (c) 2022-2022 Nicola Worthington <nicolaw@tfb.net>
+#
 # https://gitlab.com/nicolaw/tiddlywiki
+# https://nicolaw.uk
+# https://nicolaw.uk/#TiddlyWiki
+#
 
 version: "3.4"
 

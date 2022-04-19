@@ -1,3 +1,12 @@
+#
+# MIT License
+# Copyright (c) 2022-2022 Nicola Worthington <nicolaw@tfb.net>
+#
+# https://gitlab.com/nicolaw/tiddlywiki
+# https://nicolaw.uk
+# https://nicolaw.uk/#TiddlyWiki
+#
+
 packer {
   required_plugins {
     amazon = {
@@ -88,7 +97,7 @@ build {
   provisioner "file" {
     sources = [
       "tiddlywiki.service",
-      "tiddlywiki.service.conf",
+      "tiddlywiki.conf",
     ]
     destination = "/tmp/"
   }
@@ -96,18 +105,17 @@ build {
   provisioner "shell" {
     inline = [
       "sleep 10",
-      "sed -i 's/^[[:space:]]*#[[:space:]]*TW_PORT=.*/TW_PORT=80/' /tmp/tiddlywiki.service.conf",
-      "sed -i 's/^[[:space:]]*#[[:space:]]*TW_PORT=.*/TW_PORT=80/' /tmp/tiddlywiki.service.conf",
+      "sed -i 's/^[[:space:]]*#[[:space:]]*TW_PORT=.*/TW_PORT=80/' /tmp/tiddlywiki.conf",
       "sudo mkdir -pv /etc/tiddlywiki/ /home/ec2-user/tiddlywiki/",
       "sudo mv -v /tmp/tiddlywiki.service /etc/systemd/system/tiddlywiki.service",
-      "sudo mv -v /tmp/tiddlywiki.service.conf /etc/tiddlywiki/tiddlywiki.service.conf",
+      "sudo mv -v /tmp/tiddlywiki.conf /etc/tiddlywiki/tiddlywiki.conf",
       "sudo yum update -y",
       "sudo yum install -y docker",
       "sudo systemctl daemon-reload",
       "sudo systemctl enable docker.service",
       "sudo systemctl start docker.service",
       "sleep 10",
-      "sudo docker volume create --name tiddlywiki.service --opt type=none --opt device=/home/ec2-user/tiddlywiki --opt o=bind",
+      "sudo docker volume create --name tiddlywiki --opt type=none --opt device=/home/ec2-user/tiddlywiki --opt o=bind",
       "sudo systemctl enable tiddlywiki.service",
       "sudo systemctl start tiddlywiki.service",
     ]

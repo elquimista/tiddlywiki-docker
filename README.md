@@ -50,12 +50,12 @@ project. (See https://gitlab.com/nicolaw/tiddlywiki). This can be installed to
 automatically start one or more TiddlyWikis every time your machine boots.
 
 It also provides you with some level of configurability by simply changing the
-contents of the `/etc/tiddlywiki/mywiki.service.conf` configuration file.
+contents of the `/etc/tiddlywiki/mywiki.conf` configuration file.
 
 ```console
 $ sudo mkdir /etc/tiddlywiki/
 $ sudo cp tiddlywiki.service /etc/systemd/system/mywiki.service
-$ sudo cp tiddlywiki.service.conf /etc/tiddlywiki/mywiki.service.conf
+$ sudo cp tiddlywiki.conf /etc/tiddlywiki/mywiki.conf
 $ sudo systemctl daemon-reload
 $ sudo systemctl start mywiki.service
 ```
@@ -88,12 +88,12 @@ on disk in the event that you wish to perform a backup.
 
 Alternatively, to specify a bind mount location, uncomment and modify the
 `TW_DOCKERVOLUME` line, and optionally the `TW_DOCKERUID` and `TW_DOCKERGID`
-lines in the `/etc/tiddlywiki/mywiki.service.conf` configuration file.
+lines in the `/etc/tiddlywiki/mywiki.conf` configuration file.
 
 You will need to restart the service once you have saved your file change.
 
 ```console
-$ sudo vi /etc/tiddlywiki/mywiki.service.conf
+$ sudo vi /etc/tiddlywiki/mywiki.conf
 $ sudo systemctl restart mywiki.service
 ```
 
@@ -111,12 +111,12 @@ $ docker run -p 8080:8080 -e "TW_USERNAME=$USER" -e "TW_PASSWORD=hunter2" --name
 
 Similarly if you are using systemd to start your TiddlyWiki, uncomment and
 modify the `TW_USERNAME` and `TW_PASSWORD` lines from the
-`/etc/tiddlywiki/mywiki.service.conf` file.
+`/etc/tiddlywiki/mywiki.conf` file.
 
 You will need to restart the service once you have saved your file change.
 
 ```console
-$ sudo vi /etc/tiddlywiki/mywiki.service.conf
+$ sudo vi /etc/tiddlywiki/mywiki.conf
 $ sudo systemctl restart mywiki.service
 ```
 
@@ -230,7 +230,7 @@ Tiddler data is stored in a bind mount under `/home/ec2-user/tiddlywiki` by
 default.
 
 Refer to the configuration variables documentation above to modify these
-settings in the `/etc/tiddlywiki/tiddlywiki.service.conf` configuration file.
+settings in the `/etc/tiddlywiki/tiddlywiki.conf` configuration file.
 The TiddlyWiki service may be restarted using Systemd:
 
 ```console
@@ -241,7 +241,7 @@ $ systemctl restart tiddlywiki.service
 ## Author
 
 Nicola Worthington <nicolaw@tfb.net>, https://nicolaw.uk,
-https://nicolaw.uk/#TiddlyWiki.
+https://nicolaw.uk/#TiddlyWiki, https://gitlab.com/nicolaw/tiddlywiki.
 
 
 ## License
