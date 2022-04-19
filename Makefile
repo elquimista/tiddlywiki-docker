@@ -2,11 +2,12 @@
 # MIT License
 # Copyright (c) 2017-2022 Nicola Worthington <nicolaw@tfb.net>
 #
+# https://gitlab.com/nicolaw/tiddlywiki
 # https://nicolaw.uk
 # https://nicolaw.uk/#TiddlyWiki
 #
 
-.PHONY: build push
+.PHONY: build push ami
 .DEFAULT_GOAL := build
 
 TW_VERSION = 5.2.2
@@ -32,4 +33,8 @@ build:
 
 push:
 	for t in $(IMAGE_TAGS) ; do docker $@ $$t ; done
+
+ami:
+	packer init -upgrade .
+	packer build .
 

@@ -2,6 +2,7 @@
 # MIT License
 # Copyright (c) 2017-2022 Nicola Worthington <nicolaw@tfb.net>
 #
+# https://gitlab.com/nicolaw/tiddlywiki
 # https://nicolaw.uk
 # https://nicolaw.uk/#TiddlyWiki
 #
