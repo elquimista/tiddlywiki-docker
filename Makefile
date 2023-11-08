@@ -10,9 +10,9 @@
 .PHONY: build push ami
 .DEFAULT_GOAL := build
 
-TW_VERSION = 5.2.2
-BASE_IMAGE = node:17.9-alpine3.15
-REPOSITORY = nicolaw/tiddlywiki
+TW_VERSION = 5.3.1
+BASE_IMAGE = node:20.9-alpine3.17
+REPOSITORY = elquimista/tiddlywiki
 USER       = node
 
 IMAGE_TAGS = $(REPOSITORY):$(TW_VERSION) \
