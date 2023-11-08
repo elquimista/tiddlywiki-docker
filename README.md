@@ -1,15 +1,14 @@
-# tiddlywiki
+# tiddlywiki-docker
 
 [TiddlyWiki 5](https://tiddlywiki.com) Docker image.
 
-
 ## Supported Tags
 
-* `5.2.2`, `5.2.2-node17.9-alpine3.15`, `latest`
-* `5.2.0`, `5.2.0-node17.0-alpine3.13`
-* `5.1.23`, `5.1.23-node14.18.1-alpine3.14`
-* `5.1.22`, `5.1.22-node14.9.0-alpine3.12`
-
+* `5.3.1`, `5.3.1-node20.9-alpine3.17`, `latest`
+* `5.2.2`, `5.2.2-node17.9-alpine3.15` (via nicolaw/tiddlywiki)
+* `5.2.0`, `5.2.0-node17.0-alpine3.13` (via nicolaw/tiddlywiki)
+* `5.1.23`, `5.1.23-node14.18.1-alpine3.14` (via nicolaw/tiddlywiki)
+* `5.1.22`, `5.1.22-node14.9.0-alpine3.12` (via nicolaw/tiddlywiki)
 
 ## Requirements
 
@@ -21,11 +20,10 @@
    running a recent Linux distribution that uses systemd. (Ubuntu 12 or older,
    for example, do not support systemd by default).
 
-
 ## Manual Execution
 
 ```console
-$ docker run -p 8080:8080 --name mywiki nicolaw/tiddlywiki
+$ docker run -p 8080:8080 --name mywiki elquimista/tiddlywiki
 ```
 
 Open your browser to http://localhost:8080 to access the TiddlyWiki.
@@ -39,9 +37,8 @@ $ mkdir ~/tiddlywiki
 $ docker run \
     -p 8080:8080 -d --restart unless-stopped --name mywiki \
     -v ~/tiddlywiki:/var/lib/tiddlywiki \
-    nicolaw/tiddlywiki
+    elquimista/tiddlywiki
 ```
-
 
 ## Systemd Service
 
@@ -68,7 +65,6 @@ $ sudo systemctl status mywiki.service
 $ sudo journalctl -f -u mywiki.service
 ```
 
-
 ## Tiddler Data Storage
 
 The container stores the Tiddler data in `/var/lib/tiddlywiki`. This will
@@ -78,7 +74,7 @@ Specifying a volume bind mount location for `/var/lib/tiddlywiki` will cause the
 Tiddler data to be written to that location on your local filesystem.
 
 ```console
-$ docker run --rm -p 8080:8080 -v ~/wikidata:/var/lib/tiddlywiki --name mywiki nicolaw/tiddlywiki
+$ docker run --rm -p 8080:8080 -v ~/wikidata:/var/lib/tiddlywiki --name mywiki elquimista/tiddlywiki
 ```
 
 In the case of operating TiddlyWiki from systemd, the Docker volume has the
@@ -97,7 +93,6 @@ $ sudo vi /etc/tiddlywiki/mywiki.conf
 $ sudo systemctl restart mywiki.service
 ```
 
-
 ## Authentication
 
 By default, the username is set to `anonymous` with no password.
@@ -106,7 +101,7 @@ Specify the `TW_USERNAME` and `TW_PASSWORD` environment variables to enable
 password authentication.
 
 ```console
-$ docker run -p 8080:8080 -e "TW_USERNAME=$USER" -e "TW_PASSWORD=hunter2" --name mywiki nicolaw/tiddlywiki
+$ docker run -p 8080:8080 -e "TW_USERNAME=$USER" -e "TW_PASSWORD=hunter2" --name mywiki elquimista/tiddlywiki
 ```
 
 Similarly if you are using systemd to start your TiddlyWiki, uncomment and
@@ -119,7 +114,6 @@ You will need to restart the service once you have saved your file change.
 $ sudo vi /etc/tiddlywiki/mywiki.conf
 $ sudo systemctl restart mywiki.service
 ```
-
 
 ## Configurable Variables
 
@@ -162,7 +156,6 @@ TW_DOCKERUID=0
 TW_DOCKERGID=0
 ```
 
-
 ## Docker Compose
 
 More experienced users may wish to use `docker-compose` to dynamically build a
@@ -186,26 +179,25 @@ Example partial [Docker compose](https://docs.docker.com/compose/) definition:
 ```yaml
 tiddlywiki:
   container_name: tiddlywiki
-  image: nicolaw/tiddlywiki
+  image: elquimista/tiddlywiki
   build:
-    context: https://gitlab.com/nicolaw/tiddlywiki.git
+    context: https://github.com/elquimista/tiddlywiki-docker.git
     args:
-      TW_VERSION: 5.2.2
+      TW_VERSION: 5.3.1
       USER: 501
-      BASE_IMAGE: 17.9-alpine3.15
+      BASE_IMAGE: 20.9-alpine3.17
 ````
 
-To use the provided https://gitlab.com/nicolaw/tiddlywiki/-/blob/master/docker-compose.yaml:
+To use the provided https://github.com/elquimista/tiddlywiki-docker/blob/main/docker-compose.yaml:
 
 ```console
 $ docker-compose up -d
 Starting tiddlywiki ... done
 ```
 
-
 ## Packer AWS AMIs
 
-A [Packer HCL definition](https://www.packer.io/) https://gitlab.com/nicolaw/tiddlywiki/-/blob/master/docker-compose.yaml
+A [Packer HCL definition](https://www.packer.io/) https://github.com/elquimista/tiddlywiki-docker/blob/main/docker-compose.yaml
 provides an easy mechanism to build an AWS EC2 AMI.
 
 ```console
@@ -237,12 +229,10 @@ The TiddlyWiki service may be restarted using Systemd:
 $ systemctl restart tiddlywiki.service
 ```
 
-
-## Author
+## Credits
 
 Nicola Worthington <nicolaw@tfb.net>, https://nicolaw.uk,
 https://nicolaw.uk/#TiddlyWiki, https://gitlab.com/nicolaw/tiddlywiki.
-
 
 ## License
 
